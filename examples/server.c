@@ -5,10 +5,22 @@
 #include <sys/socket.h>
 #include <unistd.h>
 #include <stdbool.h>
-
+#include <errno.h>
 #define TRUE = true;
 
 static void do_something(int connfd);
+
+static void die(const char *msg)
+{
+    int err = errno;
+    fprintf(stderr, "[%d] %s\n", err, msg);
+    abort();
+}
+
+static void msg(const char *msg)
+{
+    fprintf(stderr, "%s\n", msg);
+}
 
 void main()
 {
@@ -31,7 +43,7 @@ void main()
         die("bind()");
     }
 
-    int rv = listen(fd, SOMAXCONN);
+    rv = listen(fd, SOMAXCONN);
 
     if (rv)
     {
@@ -53,6 +65,7 @@ void main()
         do_something(connfd);
         close(connfd);
     }
+    return 0;
 }
 
 static void do_something(int connfd)

@@ -5,6 +5,13 @@
 #include <sys/socket.h>
 #include <unistd.h>
 #include <stdbool.h>
+#include <errno.h>
+static void die(const char *msg)
+{
+    int err = errno;
+    fprintf(stderr, "[%d] %s\n", err, msg);
+}
+
 int main()
 {
     int fd = socket(AF_INET, SOCK_STREAM, 0);
