@@ -65,6 +65,16 @@ void main()
         do_something(connfd);
         close(connfd);
     }
+
+    while (true)
+    {
+        int32_t err = one_request(connfd);
+
+        if (err)
+        {
+            break;
+        }
+    }
     return 0;
 }
 
@@ -84,4 +94,38 @@ static void do_something(int connfd)
 
     char wbuf[] = "world";
     write(connfd, wbuf, strlen(wbuf));
+}
+
+static int32_t read_full(int fd, char *buff, size_t n)
+{
+    while (n > 0)
+    {
+        ssize_t rv = read(fd, &buff, n);
+
+        if (rv <= 0)
+        {
+            return -1;
+        }
+        assert((size_t)rv <= n);
+        n -= (size_t)rv;
+        buff += rv;
+    }
+    return 0;
+}
+
+static int32_t write_all(int fd, char *buff, size_t n)
+{
+    while (n > 0)
+    {
+        int rv = write(fd, buff, n);
+
+        if (rv <= 0)
+        {
+            return -1;
+        }
+        assert((size_t)rv <= n);
+        n -= (size_t)rv;
+        buff += rv;
+    }
+    return 0;
 }
