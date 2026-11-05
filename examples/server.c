@@ -6,7 +6,6 @@
 #include <unistd.h>
 #include <stdbool.h>
 #include <errno.h>
-#define TRUE = true;
 
 static void do_something(int connfd);
 
