@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <stdbool.h>
 #include <errno.h>
+#include <assert.h>
 
 const size_t k_max_msg = 4096;
 
@@ -13,6 +14,10 @@ static void die(const char *msg)
 {
     int err = errno;
     fprintf(stderr, "[%d] %s\n", err, msg);
+}
+static void msg(const char *msg)
+{
+    fprintf(stderr, "%s\n", msg);
 }
 
 int main()
@@ -49,8 +54,31 @@ int main()
         die("read");
     }
 
+    int32_t err = query(fd, "hello2");
+
+    if (err)
+    {
+        goto L_DONE;
+    }
+
+    err = query(fd, "hello3");
+
+    if (err)
+    {
+        goto L_DONE;
+    }
+
+    err = query(fd, "hello4");
+
+    if (err)
+    {
+        goto L_DONE;
+    }
+
     printf("server says %s\n", rbuf);
+L_DONE:
     close(fd);
+    return 0;
 }
 
 static int32_t query(int fd, const char *text)

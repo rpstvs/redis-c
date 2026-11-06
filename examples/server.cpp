@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <stdbool.h>
 #include <errno.h>
+#include <assert.h>
 
 static void do_something(int connfd);
 
@@ -180,7 +181,7 @@ static int32_t one_request(int connfd)
 
     len = (uint32_t)strlen(reply);
 
-    memccpy(wbuf, &len, 4);
-    memccpy(&wbuf[4], reply, len);
+    memcpy(wbuf, &len, 4);
+    memcpy(&wbuf[4], reply, len);
     return write_all(connfd, wbuf, 4 + len);
 }
