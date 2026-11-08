@@ -8,7 +8,26 @@
 #include <errno.h>
 #include <assert.h>
 
-static void do_something(int connfd);
+enum
+{
+    STATE_REQ = 0,
+    STATE_RES = 1,
+    STATE_END = 2,
+};
+
+struct Conn
+{
+    int fd = -1;
+    uint32_t state = 0;
+    size_t rbuf_size = 0;
+    uint8_t rbuf[4 + k_max_msg];
+    size_t wbuf_size = 0;
+    size_t wbuf_sent = 0;
+    uint8_t wbuf[4 + k_max_msg];
+};
+
+static void
+do_something(int connfd);
 
 static void die(const char *msg)
 {
@@ -184,4 +203,26 @@ static int32_t one_request(int connfd)
     memcpy(wbuf, &len, 4);
     memcpy(&wbuf[4], reply, len);
     return write_all(connfd, wbuf, 4 + len);
+}
+
+static void fd_set_nb(int fd)
+{
+    errno = 0;
+    int flags = fcntl(fd, F_GETFL, 0);
+
+    if (errno)
+    {
+        die("fcntl error");
+        return;
+    }
+
+    flags |= O_NONBLOCK;
+
+    errno = 0;
+
+    (void)fcntl(fd, F_SETFL, flags);
+    if (errno)
+    {
+        die("fcntl error");
+    }
 }
